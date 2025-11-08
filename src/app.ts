@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, RequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -22,6 +22,10 @@ if (config.nodeEnv !== 'production') {
   app.use(morgan('combined'));
 }
 
+// Body parser
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
@@ -30,14 +34,9 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use('/api/', limiter);
 
-// Body parser
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Routes
-app.use('/api', routes);
+// Routes avec rate limiting
+app.use('/api', limiter, routes);
 
 // Route par défaut
 app.get('/', (_req, res) => {
