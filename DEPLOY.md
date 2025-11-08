@@ -24,10 +24,21 @@ NODE_ENV=production
 
 ### Commandes de build
 
-Dans les paramètres du service Render :
+⚠️ **IMPORTANT** : Dans les paramètres du service Render, vous DEVEZ configurer :
 
 - **Build Command**: `yarn install && yarn build`
 - **Start Command**: `yarn start`
+
+**Note** : Si vous ne configurez pas la commande de build, Render n'exécutera que `yarn install` et le dossier `dist/` ne sera pas créé, ce qui causera une erreur au démarrage.
+
+### Configuration dans le dashboard Render
+
+1. Allez dans votre service Render
+2. Cliquez sur "Settings"
+3. Dans la section "Build & Deploy" :
+   - **Build Command** : `yarn install && yarn build`
+   - **Start Command** : `yarn start`
+4. Sauvegardez les changements
 
 ### Base de données PostgreSQL
 
