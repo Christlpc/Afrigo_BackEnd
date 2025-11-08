@@ -1,0 +1,598 @@
+openapi: 3.0.3
+info:
+  title: AfriGo API
+  description: API RESTful pour l'application VTC AfriGo
+  version: 1.0.0
+  contact:
+    name: Support AfriGo
+    email: support@afrigo.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Serveur de développement
+  - url: https://api.afrigo.com/api
+    description: Serveur de production
+
+tags:
+  - name: Authentification
+    description: Endpoints d'authentification
+  - name: Adresses
+    description: Gestion des adresses
+  - name: Routes
+    description: Gestion des commandes de taxi
+  - name: Wallet
+    description: Gestion du portefeuille
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentification
+      summary: Inscription
+      description: Crée un nouveau compte utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              email: client@example.com
+              phone: "+237612345678"
+              password: password123
+              firstName: Jean
+              lastName: Dupont
+              userType: client
+      responses:
+        '201':
+          description: Inscription réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentification
+      summary: Connexion
+      description: Authentifie un utilisateur et retourne un token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/profile:
+    get:
+      tags:
+        - Authentification
+      summary: Profil utilisateur
+      description: Récupère les informations du profil de l'utilisateur connecté
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profil récupéré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /addresses:
+    post:
+      tags:
+        - Adresses
+      summary: Créer une adresse
+      description: Crée une nouvelle adresse pour l'utilisateur connecté
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressCreateRequest'
+      responses:
+        '201':
+          description: Adresse créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Adresses
+      summary: Récupérer mes adresses
+      description: Récupère toutes les adresses de l'utilisateur connecté
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Adresses récupérées avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /addresses/{id}/favorite:
+    patch:
+      tags:
+        - Adresses
+      summary: Mettre à jour une adresse favorite
+      description: Marque ou retire le statut de favorite d'une adresse
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isFavorite:
+                  type: boolean
+      responses:
+        '200':
+          description: Adresse mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /routes:
+    post:
+      tags:
+        - Routes
+      summary: Créer une commande
+      description: Crée une nouvelle commande de taxi
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteCreateRequest'
+      responses:
+        '201':
+          description: Commande créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Routes
+      summary: Récupérer mes commandes
+      description: Récupère toutes les commandes de l'utilisateur connecté
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Commandes récupérées avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /routes/{id}:
+    get:
+      tags:
+        - Routes
+      summary: Récupérer une commande
+      description: Récupère les détails d'une commande spécifique
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Commande récupérée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Commande non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /routes/{id}/cancel:
+    post:
+      tags:
+        - Routes
+      summary: Annuler une commande
+      description: Annule une commande en attente
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Commande annulée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /routes/{id}/pay-wallet:
+    post:
+      tags:
+        - Routes
+      summary: Payer avec le wallet
+      description: Effectue le paiement d'une commande avec le wallet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Paiement effectué avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Erreur (solde insuffisant, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /routes/available-drivers:
+    get:
+      tags:
+        - Routes
+      summary: Trouver des chauffeurs disponibles
+      description: Recherche des chauffeurs disponibles près d'une position
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: routeType
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [taxi, moto, vip]
+        - name: radiusKm
+          in: query
+          schema:
+            type: number
+            default: 5
+      responses:
+        '200':
+          description: Chauffeurs disponibles récupérés
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /wallet/balance:
+    get:
+      tags:
+        - Wallet
+      summary: Récupérer le solde
+      description: Récupère le solde actuel du wallet
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Solde récupéré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /wallet/recharge:
+    post:
+      tags:
+        - Wallet
+      summary: Recharger le wallet
+      description: Recharge le wallet avec un montant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletRechargeRequest'
+      responses:
+        '200':
+          description: Portefeuille rechargé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/transactions:
+    get:
+      tags:
+        - Wallet
+      summary: Historique des transactions
+      description: Récupère l'historique des transactions du wallet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Transactions récupérées avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - phone
+        - password
+        - userType
+      properties:
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          minLength: 9
+          maxLength: 20
+        password:
+          type: string
+          minLength: 6
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userType:
+          type: string
+          enum: [client, driver, merchant, livreur]
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AddressCreateRequest:
+      type: object
+      required:
+        - fullAddress
+        - latitude
+        - longitude
+      properties:
+        fullAddress:
+          type: string
+          minLength: 5
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+        addressLabel:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        additionalInfo:
+          type: string
+
+    RouteCreateRequest:
+      type: object
+      required:
+        - pickupAddressId
+        - dropoffAddressId
+        - pickupLatitude
+        - pickupLongitude
+        - dropoffLatitude
+        - dropoffLongitude
+        - routeType
+      properties:
+        pickupAddressId:
+          type: integer
+        dropoffAddressId:
+          type: integer
+        pickupLatitude:
+          type: number
+        pickupLongitude:
+          type: number
+        dropoffLatitude:
+          type: number
+        dropoffLongitude:
+          type: number
+        routeType:
+          type: string
+          enum: [taxi, moto, vip, carpool]
+        vipClass:
+          type: string
+          enum: [business, luxe, xl]
+        scheduledAt:
+          type: string
+          format: date-time
+        thirdPartyOrder:
+          type: boolean
+        thirdPartyName:
+          type: string
+        thirdPartyPhone:
+          type: string
+        notes:
+          type: string
+
+    WalletRechargeRequest:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          minimum: 100
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        phone:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userType:
+          type: string
+        status:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            token:
+              type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []
+
