@@ -2,9 +2,8 @@ import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { RouteModel } from '../models/Route';
 import { PricingService } from '../services/pricingService';
-import { sendSuccess, sendError } from '../utils/response';
+import { sendSuccess } from '../utils/response';
 import { NotFoundError, ValidationError } from '../utils/errors';
-import { RouteStatus, PaymentMethod, PaymentStatus } from '../types/database';
 import { WalletModel } from '../models/Wallet';
 
 export class RouteController {

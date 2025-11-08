@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserModel } from '../models/User';
 import { config } from '../config/env';
-import { sendSuccess, sendError } from '../utils/response';
+import { sendSuccess } from '../utils/response';
 import { UnauthorizedError, ValidationError } from '../utils/errors';
 
 export class AuthController {
@@ -46,7 +46,7 @@ export class AuthController {
           userType: user.user_type,
         },
         config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
+        { expiresIn: config.jwt.expiresIn } as jwt.SignOptions
       );
 
       sendSuccess(
@@ -100,7 +100,7 @@ export class AuthController {
           userType: user.user_type,
         },
         config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
+        { expiresIn: config.jwt.expiresIn } as jwt.SignOptions
       );
 
       sendSuccess(

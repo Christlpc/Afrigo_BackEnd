@@ -7,7 +7,6 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config/env';
 import routes from './routes';
 import { errorHandler } from './utils/errors';
-import logger from './utils/logger';
 
 const app: Application = express();
 
@@ -28,6 +27,8 @@ const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
   max: config.rateLimit.maxRequests,
   message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use('/api/', limiter);
 
@@ -39,7 +40,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api', routes);
 
 // Route par défaut
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({
     name: config.app.name,
     version: config.app.version,
@@ -52,7 +53,7 @@ app.get('/', (req, res) => {
 app.use(errorHandler);
 
 // Gestion des routes non trouvées
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({
     success: false,
     message: 'Route non trouvée',

@@ -1,5 +1,5 @@
 import pool from '../config/database';
-import { Wallet, WalletTransaction, TransactionType } from '../types/database';
+import { Wallet, WalletTransaction } from '../types/database';
 
 export class WalletModel {
   static async findByUserId(userId: number): Promise<Wallet | null> {
@@ -17,8 +17,8 @@ export class WalletModel {
     userId: number,
     amount: number,
     description?: string,
-    referenceType?: string,
-    referenceId?: number
+    referenceType?: string | null,
+    referenceId?: number | null
   ): Promise<WalletTransaction> {
     const client = await pool.connect();
     try {
@@ -30,6 +30,10 @@ export class WalletModel {
         const createQuery = 'INSERT INTO wallet (user_id, balance) VALUES ($1, 0) RETURNING *';
         const createResult = await client.query(createQuery, [userId]);
         wallet = createResult.rows[0];
+      }
+
+      if (!wallet) {
+        throw new Error('Impossible de créer ou trouver le wallet');
       }
 
       // Mettre à jour le solde
@@ -75,8 +79,8 @@ export class WalletModel {
     userId: number,
     amount: number,
     description?: string,
-    referenceType?: string,
-    referenceId?: number
+    referenceType?: string | null,
+    referenceId?: number | null
   ): Promise<WalletTransaction> {
     const client = await pool.connect();
     try {

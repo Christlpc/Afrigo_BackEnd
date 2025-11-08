@@ -12,7 +12,7 @@ router.use('/wallet', walletRoutes);
 router.use('/addresses', addressRoutes);
 
 // Route de santé
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),

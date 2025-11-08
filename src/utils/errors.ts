@@ -39,9 +39,9 @@ export class ForbiddenError extends AppError {
 
 export const errorHandler = (
   error: Error,
-  req: any,
+  _req: any,
   res: any,
-  next: any
+  _next: any
 ) => {
   if (error instanceof AppError) {
     const response: any = {

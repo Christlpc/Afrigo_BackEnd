@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { WalletModel } from '../models/Wallet';
 import { sendSuccess } from '../utils/response';
-import { NotFoundError, ValidationError } from '../utils/errors';
+import { ValidationError } from '../utils/errors';
 
 export class WalletController {
   /**
@@ -45,8 +45,7 @@ export class WalletController {
         userId,
         amount,
         `Recharge de portefeuille de ${amount} XAF`,
-        'recharge',
-        null
+        'recharge'
       );
 
       sendSuccess(
