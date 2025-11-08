@@ -1,5 +1,13 @@
 import winston from 'winston';
 import { config } from '../config/env';
+import fs from 'fs';
+import path from 'path';
+
+// Créer le dossier logs s'il n'existe pas
+const logsDir = path.join(process.cwd(), 'logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
 
 const logger = winston.createLogger({
   level: config.nodeEnv === 'production' ? 'info' : 'debug',

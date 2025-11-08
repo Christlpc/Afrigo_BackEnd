@@ -16,10 +16,11 @@ const startServer = async () => {
     }
 
     // Démarrer le serveur Express
-    app.listen(PORT, () => {
+    // Écouter sur toutes les interfaces (0.0.0.0) pour le déploiement
+    app.listen(PORT, '0.0.0.0', () => {
       logger.info(`🚀 Serveur démarré sur le port ${PORT}`);
       logger.info(`📱 Environnement: ${config.nodeEnv}`);
-      logger.info(`🌐 API disponible sur http://localhost:${PORT}/api`);
+      logger.info(`🌐 API disponible sur http://0.0.0.0:${PORT}/api`);
     });
   } catch (error) {
     logger.error('Erreur lors du démarrage du serveur:', error);

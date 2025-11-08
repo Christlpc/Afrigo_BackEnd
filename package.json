@@ -26,7 +26,6 @@
     "express-rate-limit": "^7.1.5",
     "compression": "^1.7.4",
     "winston": "^3.11.0",
-    "node-postgis": "^0.2.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
